@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智能膠囊灌裝系統 2025</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Firebase 初始化 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
+
+        // 將 Firebase 實例設為全局變量
+        window.db = null;
+        
+        // 初始化 Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqdwiIMH2pAgQK_y5YQVmOFpsDfZ7ZHuI",
+            authDomain: "encapsulation-da072.firebaseapp.com",
+            projectId: "encapsulation-da072",
+            storageBucket: "encapsulation-da072.firebasestorage.app",
+            messagingSenderId: "41576121757",
+            appId: "1:41576121757:web:4d717f0a7ee8cb29fb1b74",
+            measurementId: "G-2VGDQYDDTS"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        window.db = getFirestore(app);
+    </script>
+    <!-- 修改音效元素 -->
+    <audio id="successSound" preload="auto" playsinline>
+        <source src="sounds/success.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="errorSound" preload="auto" playsinline>
+        <source src="sounds/error.mp3" type="audio/mpeg">
+    </audio>
+</head>
+<body>
+    <!-- 在 game-container 前添加 loading 畫面 -->
+    <div class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-icon">💊</div>
+            <h2>智能膠囊灌裝系統 2025</h2>
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="loading-text">系統校準中 <span class="progress-number">0</span>%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">
+                <span class="icon">💊</span>
+                <h1>智能膠囊灌裝系統 2025</h1>
+            </div>
+
+            <div class="control-panel">
+                <button id="startGame" class="start-button">
+                    <span class="button-icon">🔬</span>
+                    開始灌裝
+                </button>
+                
+                <div class="game-stats">
+                    <div class="stat-item timer">
+                        <div class="icon">⏱️</div>
+                        <span>操作時限：<span id="time">20</span>秒</span>
+                    </div>
+                    <div class="stat-item score">
+                        <div class="icon">📊</div>
+                        <span>精確度：<span id="score">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <div class="game-main">
+                <div class="capsule-container">
+                    <div class="level-scale">
+                        <div class="scale-mark">100%</div>
+                        <div class="scale-mark">75%</div>
+                        <div class="scale-mark">50%</div>
+                        <div class="scale-mark">25%</div>
+                        <div class="scale-mark">0%</div>
+                    </div>
+
+                    <div class="capsule-wrapper">
+                        <div class="target-indicator">目標劑量指示器</div>
+                        <div class="capsule">
+                            <div class="capsule-top"></div>
+                            <div class="powder-level" id="currentLevel"></div>
+                            <div class="target-line" id="targetLine"></div>
+                            <div class="capsule-bottom"></div>
+                        </div>
+                    </div>
+
+                    <div class="target-info">
+                        <div class="icon">🎯</div>
+                        <div>目標劑量：<span id="targetAmount" data-min-target="40">0</span>%</div>
+                    </div>
+                </div>
+
+                <div class="control-area">
+                    <div class="instruction">
+                        <span class="icon">💡</span>
+                        長按按鈕進行灌裝，鬆開立即停止
+                    </div>
+                    <button id="fillButton" class="fill-button">
+                        <span class="button-icon">⚡</span>
+                        按住開始灌裝
+                    </button>
+                </div>
+            </div>
+
+            <div class="highscores">
+                <h3><span class="icon">🏆</span> 灌裝精準度排行</h3>
+                <div class="highscores-list" id="highscoresList">
+                    <div class="loading">數據同步中...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-messages" id="gameMessages"></div>
+    </div>
+
+    <!-- 修改名字輸入對話框 -->
+    <div class="name-input-modal">
+        <div class="modal-content">
+            <h3>🏅 卓越表現！</h3>
+            <p class="score-text">灌裝精確度達到 <span class="final-score">0</span> 分</p>
+            <div class="input-group">
+                <label for="playerName">操作員代號：</label>
+                <input type="text" id="playerName" maxlength="10" placeholder="請輸入代號（最多10字）">
+            </div>
+            <button class="submit-button">提交記錄</button>
+        </div>
+    </div>
+
+    <script src="game.js" type="module"></script>
+</body>
+</html> 

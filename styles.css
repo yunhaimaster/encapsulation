@@ -1,0 +1,862 @@
+:root {
+    --primary-color: #00F5FF;
+    --secondary-color: #7B42F6;
+    --accent-color: #FF2E63;
+    --success-color: #00FF9F;
+    --error-color: #FF2E63;
+    --bg-color: #0A0E17;
+    --panel-bg: rgba(255, 255, 255, 0.1);
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --border-radius: 16px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+    --header-height: 60px;
+    --footer-height: 80px;
+    --content-spacing: 15px;
+    --neon-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+    --hologram-gradient: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(123, 66, 246, 0.1));
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: radial-gradient(circle at center, #1A1F35 0%, #0A0E17 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+.game-container {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: none;
+    width: 100%;
+    height: 100vh;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+/* 添加全息圖效果 */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--hologram-gradient);
+    pointer-events: none;
+    opacity: 0.5;
+    animation: hologram 10s linear infinite;
+}
+
+/* 頂部區域 */
+.game-header {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: var(--glass-border);
+}
+
+.game-title {
+    margin-bottom: 10px;
+}
+
+.control-panel {
+    margin-bottom: 10px;
+}
+
+/* 主要遊戲區域 - 使用 flex-grow 讓它填充剩餘空間 */
+.game-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.game-main {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.game-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.game-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 188, 212, 0.3);
+    border-radius: 3px;
+}
+
+/* 膠囊容器 */
+.capsule-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 15px;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 0;
+}
+
+/* 膠囊包裝器 */
+.capsule-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 目標指示器 */
+.target-indicator {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* 刻度尺 */
+.level-scale {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    padding: 5px 0;
+}
+
+/* 目標信息 */
+.target-info {
+    text-align: center;
+    padding: 12px 15px;
+    background: rgba(0, 188, 212, 0.1);
+    border: 1px solid rgba(0, 188, 212, 0.2);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    white-space: nowrap;
+}
+
+/* 控制區域 */
+.control-area {
+    position: relative;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 遊戲訊息 */
+.game-messages {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    padding: 15px 25px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+    opacity: 0; /* 預設隱藏 */
+    transition: opacity 0.3s ease;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+}
+
+.game-messages:not(:empty) {
+    opacity: 1; /* 有內容時才顯示 */
+    background: var(--glass-bg);
+    border: var(--glass-border);
+}
+
+/* 排行榜區域 */
+.highscores {
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.1);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
+}
+
+.game-title {
+    text-align: center;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.game-title h1 {
+    font-size: 1.8em;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.game-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.1);
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+.instruction {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    background: rgba(0, 188, 212, 0.1);
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0, 188, 212, 0.2);
+}
+
+.fill-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 15px 30px;
+    font-size: 1.1em;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.fill-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: button-shine 3s linear infinite;
+}
+
+.fill-button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.2);
+}
+
+.start-button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 15px 30px;
+    font-size: 1.2em;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.start-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: button-shine 3s linear infinite;
+}
+
+.start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
+}
+
+/* 成功訊息樣式 */
+.game-messages.success {
+    background: rgba(0, 230, 118, 0.15);
+    color: #00E676;
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    animation: message-slide-in 0.3s ease-out;
+}
+
+/* 錯誤訊息樣式 */
+.game-messages.error {
+    background: rgba(255, 23, 68, 0.15);
+    color: #FF1744;
+    border: 1px solid rgba(255, 23, 68, 0.3);
+    animation: message-slide-in 0.3s ease-out;
+}
+
+.highscores h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.highscores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.highscore-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 245, 255, 0.1);
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.highscore-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+}
+
+@media (max-height: 700px) {
+    .game-container {
+        height: 100vh;
+    }
+    
+    .game-header {
+        padding: 10px;
+    }
+    
+    .game-title h1 {
+        font-size: 1.4em;
+    }
+    
+    .game-content {
+        padding: 10px;
+        gap: 15px;
+    }
+    
+    .game-main {
+        gap: 10px;
+    }
+    
+    .capsule-container {
+        padding: 15px;
+    }
+    
+    .control-area {
+        padding: 12px;
+    }
+    
+    .fill-button {
+        padding: 12px 20px;
+    }
+    
+    .capsule {
+        height: 180px;
+    }
+    
+    .level-scale {
+        height: 180px;
+    }
+    
+    .start-button {
+        padding: 12px 20px;
+    }
+}
+
+@media (min-height: 701px) {
+    .game-container {
+        height: 95vh;
+        margin: 2.5vh 0;
+        border-radius: var(--border-radius);
+    }
+}
+
+@media (max-width: 380px) {
+    :root {
+        --border-radius: 12px;
+    }
+    
+    .game-container {
+        padding: 10px;
+    }
+    
+    .game-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-item {
+        font-size: 0.9em;
+    }
+    
+    .capsule-container {
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+    }
+    
+    .target-info {
+        grid-column: 1 / -1;
+        margin-top: 10px;
+    }
+    
+    .level-scale {
+        font-size: 0.8em;
+    }
+    
+    .game-content {
+        padding: 8px;
+        gap: 12px;
+    }
+    
+    .game-main {
+        gap: 8px;
+    }
+    
+    .control-area {
+        padding: 10px;
+    }
+    
+    .fill-button {
+        padding: 10px 15px;
+        font-size: 1em;
+    }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.5; transform: scale(1); }
+}
+
+.perfect {
+    animation: success-pulse 0.5s ease-in-out;
+}
+
+@keyframes glow {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+/* 添加滑鼠懸停效果 */
+.stat-item:hover,
+.highscore-item:hover {
+    background: rgba(0, 188, 212, 0.15);
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+@keyframes success-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px 10px rgba(0, 230, 118, 0);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+        transform: scale(1);
+    }
+}
+
+@keyframes success-flash {
+    0% { 
+        background: rgba(0, 230, 118, 0.3);
+        box-shadow: 0 0 30px rgba(0, 230, 118, 0.5);
+    }
+    100% { 
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 0 20px rgba(0, 188, 212, 0.1);
+    }
+}
+
+@keyframes error-flash {
+    0% { 
+        background: rgba(255, 23, 68, 0.3);
+        box-shadow: 0 0 30px rgba(255, 23, 68, 0.5);
+    }
+    100% { 
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 0 20px rgba(0, 188, 212, 0.1);
+    }
+}
+
+.capsule.success {
+    animation: success-flash 0.5s ease-out;
+}
+
+.capsule.error {
+    animation: error-flash 0.5s ease-out;
+}
+
+@keyframes message-slide-in {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 修改粉末動畫 */
+.powder-level.success {
+    background: linear-gradient(135deg, var(--success-color), #69F0AE);
+    box-shadow: 0 0 30px rgba(0, 230, 118, 0.5);
+}
+
+.powder-level.error {
+    background: linear-gradient(135deg, var(--error-color), #FF5252);
+    box-shadow: 0 0 30px rgba(255, 23, 68, 0.5);
+}
+
+@keyframes error-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px 10px rgba(255, 23, 68, 0);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0);
+        transform: scale(1);
+    }
+}
+
+/* 修復膠囊樣式 */
+.capsule {
+    width: 100px;
+    height: 200px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+}
+
+.capsule::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 245, 255, 0.1) 25%,
+        rgba(0, 245, 255, 0.1) 75%,
+        transparent 100%);
+    animation: scan 2s linear infinite;
+}
+
+.powder-level {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: calc(100% - 6px);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    transition: height 0.1s linear, background 0.3s ease;
+    border-radius: 0 0 47px 47px;
+    box-shadow: 0 0 30px var(--primary-color);
+}
+
+.target-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: calc(100% + 6px);
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--accent-color) 20%, 
+        var(--accent-color) 80%, 
+        transparent 100%);
+    z-index: 1;
+    box-shadow: 0 0 20px var(--accent-color);
+    margin-left: -3px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Loading 畫面 */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1f35 0%, #2a3149 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loading-content {
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.loading-icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+    animation: float 2s ease-in-out infinite;
+}
+
+.loading-content h2 {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+}
+
+.loading-progress-container {
+    width: 280px;
+    margin: 0 auto;
+}
+
+.loading-progress-bar {
+    height: 6px;
+    background: rgba(0, 188, 212, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0, 188, 212, 0.2);
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+}
+
+.loading-text {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 隱藏 loading 畫面 */
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 名字輸入對話框 */
+.name-input-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.name-input-modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    animation: modal-slide-in 0.3s ease-out;
+}
+
+.modal-content h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    text-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+}
+
+.score-text {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.final-score {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(0, 188, 212, 0.2);
+    border-radius: var(--border-radius);
+    background: rgba(0, 188, 212, 0.1);
+    color: var(--text-primary);
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+}
+
+.submit-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+}
+
+@keyframes modal-slide-in {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+@keyframes hologram {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.3; }
+}
+
+@keyframes button-shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+} 
