@@ -43,7 +43,7 @@ body {
     backdrop-filter: blur(20px);
     border: none;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     max-width: 500px;
     display: flex;
     flex-direction: column;
@@ -80,20 +80,23 @@ body {
     margin-bottom: 10px;
 }
 
-/* 主要遊戲區域 - 使用 flex-grow 讓它填充剩餘空間 */
+/* 主要遊戲區域 */
 .game-content {
     flex: 1;
     overflow-y: auto;
-    padding: 15px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
+    width: 100%;
 }
 
+/* 遊戲主區域 */
 .game-main {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 30px;
+    width: 100%;
 }
 
 .game-content::-webkit-scrollbar {
@@ -111,15 +114,78 @@ body {
 
 /* 膠囊容器 */
 .capsule-container {
+    flex: 1;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 50px 120px 1fr;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
+    gap: 30px;
     background: var(--glass-bg);
     border: var(--glass-border);
-    padding: 20px;
+    padding: 30px;
     border-radius: var(--border-radius);
-    margin-bottom: 0;
+    margin: 0;
+    height: 400px;
+    position: relative;
+}
+
+/* 刻度尺 */
+.level-scale {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    padding: 5px 0;
+    text-align: right;
+    padding-right: 10px;
+}
+
+/* 膠囊主體 */
+.capsule-body {
+    position: relative;
+    width: 80px;
+    height: 200px;
+    background: var(--glass-bg);
+    border-radius: 40px;
+    overflow: hidden;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+    margin: 0 auto; /* 水平居中 */
+}
+
+/* 膠囊顯示區 */
+.capsule-display {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 目標線 */
+#targetLine {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-color);
+    transition: bottom 0.3s ease;
+    z-index: 2;
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+/* 當前水平 */
+#currentLevel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary-color);
+    transition: height 0.1s linear;
+    z-index: 1;
+    box-shadow: 0 0 20px var(--primary-color);
 }
 
 /* 膠囊包裝器 */
@@ -137,44 +203,46 @@ body {
     text-align: center;
 }
 
-/* 刻度尺 */
-.level-scale {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 200px;
-    font-size: 0.9em;
-    color: var(--text-secondary);
-    padding: 5px 0;
-}
-
 /* 目標信息 */
 .target-info {
-    text-align: center;
     padding: 12px 15px;
     background: rgba(0, 188, 212, 0.1);
     border: 1px solid rgba(0, 188, 212, 0.2);
     border-radius: var(--border-radius);
-    color: var(--text-primary);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     backdrop-filter: blur(5px);
     white-space: nowrap;
+    min-height: 60px;
+    width: 180px;
+}
+
+/* 目標數值 */
+#targetAmount {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 3ch;
+    display: inline-block;
+    text-align: center;
+}
+
+/* 指示文字容器 */
+.instruction {
+    padding: 18px 25px;
+    font-size: 1.1em;
+    margin: 15px 0;
 }
 
 /* 控制區域 */
 .control-area {
-    position: relative;
-    background: var(--glass-bg);
-    border: var(--glass-border);
-    padding: 15px;
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
+    padding: 25px;
+    gap: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 
 /* 遊戲訊息 */
@@ -183,222 +251,101 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 100;
     padding: 15px 25px;
     border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
     pointer-events: none;
-    opacity: 0; /* 預設隱藏 */
+    opacity: 0;
     transition: opacity 0.3s ease;
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid var(--primary-color);
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+    font-size: 1.2em;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 .game-messages:not(:empty) {
-    opacity: 1; /* 有內容時才顯示 */
+    opacity: 1;
     background: var(--glass-bg);
     border: var(--glass-border);
 }
 
 /* 排行榜區域 */
 .highscores {
-    background: rgba(0, 245, 255, 0.05);
-    border: 1px solid rgba(0, 245, 255, 0.1);
-    padding: 20px;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 15px;
     border-radius: var(--border-radius);
     backdrop-filter: blur(5px);
     box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
-}
-
-.game-title {
-    text-align: center;
-    color: var(--primary-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
-}
-
-.game-title h1 {
-    font-size: 1.8em;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-.game-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.stat-item {
-    background: rgba(0, 245, 255, 0.05);
-    border: 1px solid rgba(0, 245, 255, 0.1);
-    padding: 12px 15px;
-    border-radius: var(--border-radius);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
-}
-
-.instruction {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-secondary);
-    font-size: 0.9em;
-    background: rgba(0, 188, 212, 0.1);
-    padding: 10px 15px;
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(0, 188, 212, 0.2);
-}
-
-.fill-button {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    padding: 15px 30px;
-    font-size: 1.1em;
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
-}
-
-.fill-button::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    transform: rotate(45deg);
-    animation: button-shine 3s linear infinite;
-}
-
-.fill-button:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.2);
-}
-
-.start-button {
+    min-height: 150px;
     width: 100%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    padding: 15px 30px;
-    font-size: 1.2em;
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 15px;
-    position: relative;
-    overflow: hidden;
+    margin: 0;
+    margin-bottom: 15px; /* 確保底部有間距 */
 }
 
-.start-button::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    transform: rotate(45deg);
-    animation: button-shine 3s linear infinite;
-}
-
-.start-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
-}
-
-/* 成功訊息樣式 */
-.game-messages.success {
-    background: rgba(0, 230, 118, 0.15);
-    color: #00E676;
-    border: 1px solid rgba(0, 230, 118, 0.3);
-    animation: message-slide-in 0.3s ease-out;
-}
-
-/* 錯誤訊息樣式 */
-.game-messages.error {
-    background: rgba(255, 23, 68, 0.15);
-    color: #FF1744;
-    border: 1px solid rgba(255, 23, 68, 0.3);
-    animation: message-slide-in 0.3s ease-out;
-}
-
+/* 排行榜標題 */
 .highscores h3 {
     display: flex;
     align-items: center;
     gap: 10px;
     justify-content: center;
     color: var(--primary-color);
-    margin-bottom: 20px;
-    font-size: 1.3em;
+    margin-bottom: 15px;
+    font-size: 1.2em;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+/* 排行榜列表 */
 .highscores-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    padding: 0 10px;
 }
 
+/* 排行榜項目 */
 .highscore-item {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 245, 255, 0.1);
-    padding: 15px 20px;
-    border-radius: var(--border-radius);
-    color: var(--text-primary);
+    height: 45px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: var(--border-radius);
+    width: 100%;
+    font-size: 0.9em;
+    margin-bottom: 8px; /* 添加底部間距 */
+}
+
+/* 移除底部的衝突樣式 */
+.highscore-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 移除衝突的排行榜項目統一樣式 */
+/* 刪除或注釋掉這段代碼 */
+/*
+.highscore-item {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 15px;
     margin-bottom: 10px;
-    backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
+*/
 
 .highscore-item:hover {
     transform: translateX(5px);
     box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
 }
 
-@media (max-height: 700px) {
+@media (max-height: 800px) {
     .game-container {
         height: 100vh;
     }
@@ -412,8 +359,8 @@ body {
     }
     
     .game-content {
-        padding: 10px;
-        gap: 15px;
+        padding: 15px;
+        gap: 20px;
     }
     
     .game-main {
@@ -421,7 +368,9 @@ body {
     }
     
     .capsule-container {
-        padding: 15px;
+        height: 350px;
+        padding: 20px;
+        gap: 20px;
     }
     
     .control-area {
@@ -429,7 +378,9 @@ body {
     }
     
     .fill-button {
-        padding: 12px 20px;
+        padding: 15px 25px;
+        height: 60px;
+        font-size: 1.1em;
     }
     
     .capsule {
@@ -443,6 +394,11 @@ body {
     .start-button {
         padding: 12px 20px;
     }
+    
+    .stat-item {
+        padding: 12px 15px;
+        min-height: 50px;
+    }
 }
 
 @media (min-height: 701px) {
@@ -453,53 +409,132 @@ body {
     }
 }
 
-@media (max-width: 380px) {
-    :root {
-        --border-radius: 12px;
-    }
-    
-    .game-container {
-        padding: 10px;
-    }
-    
-    .game-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .stat-item {
-        font-size: 0.9em;
-    }
-    
-    .capsule-container {
-        grid-template-columns: auto 1fr;
-        gap: 10px;
-    }
-    
-    .target-info {
-        grid-column: 1 / -1;
-        margin-top: 10px;
-    }
-    
-    .level-scale {
-        font-size: 0.8em;
-    }
-    
+@media (max-width: 480px) {
     .game-content {
-        padding: 8px;
-        gap: 12px;
+        padding: 12px;
+        padding-bottom: 20px; /* 增加底部間距 */
+        gap: 15px;
     }
-    
-    .game-main {
+
+    /* 狀態面板 */
+    .game-stats {
         gap: 8px;
     }
-    
+
+    .stat-item {
+        padding: 8px 10px;
+        min-height: 40px;
+        font-size: 0.85em;
+    }
+
+    .stat-item .icon {
+        font-size: 1em;
+        width: 20px;
+    }
+
+    /* 膠囊容器 */
+    .capsule-container {
+        height: 320px;
+        padding: 15px;
+        gap: 15px;
+        grid-template-columns: 40px 100px 1fr;
+    }
+
+    /* 刻度尺 */
+    .level-scale {
+        font-size: 0.8em;
+        padding-right: 5px;
+    }
+
+    /* 膠囊主體 */
+    .capsule-body {
+        width: 70px;
+    }
+
+    /* 目標信息 */
+    .target-info {
+        width: 140px;
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    /* 控制區域 */
     .control-area {
+        padding: 15px;
+        gap: 12px;
+    }
+
+    /* 指示文字 */
+    .instruction {
+        padding: 12px 15px;
+        font-size: 0.9em;
+        margin: 8px 0;
+    }
+
+    /* 填充按鈕 */
+    .fill-button {
+        padding: 12px 20px;
+        height: 50px;
+        font-size: 1em;
+    }
+
+    /* 排行榜區域 */
+    .highscores {
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .highscores h3 {
+        font-size: 1.1em;
+        margin-bottom: 12px;
+    }
+
+    .highscores-list {
+        gap: 6px;
+    }
+
+    .highscore-item {
+        height: 40px;
+        padding: 0 12px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 360px) {
+    .game-stats {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .capsule-container {
+        height: 280px;
+        grid-template-columns: 30px 80px 1fr;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .level-scale {
+        font-size: 0.75em;
+    }
+
+    .capsule-body {
+        width: 60px;
+    }
+
+    .target-info {
+        width: 120px;
+        font-size: 0.85em;
+    }
+
+    /* 排行榜區域 */
+    .highscores {
         padding: 10px;
     }
-    
-    .fill-button {
-        padding: 10px 15px;
-        font-size: 1em;
+
+    .highscore-item {
+        height: 35px;
+        padding: 0 10px;
+        font-size: 0.8em;
     }
 }
 
@@ -859,4 +894,125 @@ body {
 @keyframes button-shine {
     0% { transform: translateX(-100%) rotate(45deg); }
     100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* 載入中提示 */
+.loading {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 開始按鈕 */
+.start-button {
+    width: 100%;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 20px 30px;
+    font-size: 1.3em;
+    color: var(--text-primary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    margin-bottom: 20px;
+}
+
+/* 遊戲狀態面板 */
+.game-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    min-height: 45px;
+}
+
+/* 狀態項目圖標 */
+.stat-item .icon {
+    font-size: 1.2em;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+/* 狀態項目文字 */
+.stat-text {
+    font-size: 0.9em;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 狀態數值 */
+.stat-value {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* 統一所有主要區塊的樣式 */
+.capsule-container,
+.instruction,
+.control-area,
+.highscores {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    width: 100%;
+    margin: 0;
+}
+
+/* 填充按鈕 */
+.fill-button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 20px 30px;
+    font-size: 1.2em;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    height: 70px;
+}
+
+/* 排行榜項目統一樣式 */
+.highscore-item {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
 } 

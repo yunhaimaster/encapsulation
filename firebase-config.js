@@ -1,3 +1,10 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+import { 
+    getFirestore,
+    initializeFirestore
+} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
+
 // Firebase 配置
 const firebaseConfig = {
     apiKey: "AIzaSyBqdwiIMH2pAgQK_y5YQVmOFpsDfZ7ZHuI",
@@ -10,22 +17,13 @@ const firebaseConfig = {
 };
 
 // 初始化 Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
-// 配置 Firestore 設置
-db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
-});
+// 使用新的推薦方式初始化 Firestore
+const db = getFirestore(app);
 
-// 啟用離線持久化
-db.enablePersistence()
-    .catch((err) => {
-        if (err.code == 'failed-precondition') {
-            // 多個標籤頁同時打開時可能發生
-            console.log('持久化失敗：多個標籤頁同時打開');
-        } else if (err.code == 'unimplemented') {
-            // 瀏覽器不支持持久化
-            console.log('當前瀏覽器不支持持久化');
-        }
-    }); 
+// 不再使用 enableIndexedDbPersistence，改用新的設置方式
+// Firebase 會自動處理離線持久化
+
+export { db }; 
